@@ -390,7 +390,10 @@ async function sendMessage(){
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ message: text })
+    body: JSON.stringify({
+  message: text,
+  sessionId: localStorage.getItem('vex_session') || createSession()
+})
   });
 
   const data = await res.json();
