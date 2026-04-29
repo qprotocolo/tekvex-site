@@ -368,7 +368,11 @@ btn.onclick = () => {
   chat.style.display = chat.style.display === 'flex' ? 'none' : 'flex';
   chat.style.display = 'flex';
 };
-
+function createSession(){
+  const id = 'sess_' + Math.random().toString(36).substring(2) + Date.now();
+  localStorage.setItem('vex_session', id);
+  return id;
+}
 function addMessage(text, sender){
   const div = document.createElement('div');
   div.className = 'vex-msg ' + sender;
