@@ -3,316 +3,1424 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TekVex AI</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
-
+<title>TekVex AI — Recepcionista Inteligente para Clínicas</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
+/* ============================================================
+   RESET & TOKENS
+============================================================ */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:'Inter',sans-serif;
+:root {
+  --black:    #050508;
+  --dark:     #0c0c12;
+  --surface:  #13131c;
+  --surface2: #1a1a28;
+  --border:   #ffffff12;
+  --border2:  #ffffff20;
+  --green:    #00ff88;
+  --green2:   #00cc66;
+  --green-dim:#005533;
+  --glow:     rgba(0,255,136,0.12);
+  --glow2:    rgba(0,255,136,0.06);
+  --text:     #f0f4f0;
+  --muted:    #6b7a6b;
+  --muted2:   #9aaa9a;
+  --white:    #ffffff;
+  --radius:   14px;
+  --font-display: 'Syne', sans-serif;
+  --font-body:    'Space Grotesk', sans-serif;
+  --font-mono:    'JetBrains Mono', monospace;
 }
 
-body{
-background:#000;
-color:#fff;
-overflow-x:hidden;
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--black);
+  color: var(--text);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+  cursor: default;
 }
 
-/* BACKGROUND GLOW */
-body::before{
-content:"";
-position:fixed;
-width:600px;
-height:600px;
-background:radial-gradient(circle,#22c55e55,transparent);
-top:-100px;
-left:-100px;
-filter:blur(120px);
-z-index:-1;
+/* ============================================================
+   NOISE OVERLAY
+============================================================ */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 1000;
+  opacity: 0.4;
 }
 
-/* HERO */
-.hero{
-height:100vh;
-display:flex;
-flex-direction:column;
-justify-content:center;
-align-items:center;
-text-align:center;
-padding:20px;
+/* ============================================================
+   GRID BACKGROUND
+============================================================ */
+.grid-bg {
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(0,255,136,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,255,136,0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+  z-index: 0;
 }
 
-.hero h1{
-font-size:48px;
-max-width:800px;
-background:linear-gradient(90deg,#22c55e,#4ade80);
--webkit-background-clip:text;
--webkit-text-fill-color:transparent;
+/* ============================================================
+   NAV
+============================================================ */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  padding: 20px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(5,5,8,0.8);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
 }
 
-.hero p{
-margin-top:20px;
-color:#aaa;
-max-width:600px;
+.nav-logo {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--white);
+  letter-spacing: -0.5px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.btn{
-margin-top:30px;
-padding:14px 24px;
-background:#22c55e;
-border:none;
-border-radius:12px;
-cursor:pointer;
-font-weight:600;
-transition:.2s;
+.nav-logo-dot {
+  width: 8px; height: 8px;
+  background: var(--green);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--green);
+  animation: pulse 2s infinite;
 }
 
-.btn:hover{
-transform:scale(1.1);
-box-shadow:0 0 20px #22c55e;
+@keyframes pulse {
+  0%,100% { opacity:1; transform:scale(1); }
+  50%      { opacity:0.5; transform:scale(0.8); }
 }
 
-/* SECTION */
-.section{
-padding:100px 20px;
-text-align:center;
+.nav-links {
+  display: flex;
+  gap: 32px;
+  list-style: none;
 }
 
-.section h2{
-font-size:32px;
-margin-bottom:40px;
+.nav-links a {
+  font-size: 13px;
+  color: var(--muted2);
+  text-decoration: none;
+  letter-spacing: 0.5px;
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--white); }
+
+.nav-cta {
+  background: var(--green);
+  color: #000;
+  font-weight: 700;
+  font-size: 13px;
+  padding: 10px 22px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.2s;
+  letter-spacing: 0.3px;
+}
+.nav-cta:hover { background: #00ffaa; transform: translateY(-1px); }
+
+@media(max-width:768px) {
+  .nav-links { display:none; }
 }
 
-/* CARDS */
-.cards{
-display:flex;
-flex-wrap:wrap;
-gap:20px;
-justify-content:center;
+/* ============================================================
+   HERO
+============================================================ */
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding: 120px 32px 80px;
+  overflow: hidden;
 }
 
-.card{
-width:260px;
-padding:20px;
-background:rgba(255,255,255,0.03);
-border:1px solid #22c55e33;
-border-radius:16px;
-backdrop-filter:blur(10px);
-transition:.3s;
+/* Radial glow behind hero content */
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 10%; left: 50%;
+  transform: translateX(-50%);
+  width: 900px; height: 600px;
+  background: radial-gradient(ellipse, rgba(0,255,136,0.08) 0%, transparent 65%);
+  pointer-events: none;
 }
 
-.card:hover{
-transform:translateY(-10px);
-box-shadow:0 0 30px #22c55e44;
+.hero-inner {
+  position: relative;
+  z-index: 2;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 64px;
+  align-items: center;
 }
 
-/* FLOW */
-.flow{
-display:flex;
-flex-direction:column;
-gap:30px;
-max-width:600px;
-margin:auto;
+@media(max-width:900px) {
+  .hero-inner { grid-template-columns:1fr; gap:48px; }
+  .hero-right  { display:none; }
 }
 
-.flow div{
-padding:15px;
-border-left:3px solid #22c55e;
-text-align:left;
+/* LEFT COPY */
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0,255,136,0.08);
+  border: 1px solid rgba(0,255,136,0.2);
+  border-radius: 100px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-family: var(--font-mono);
+  color: var(--green);
+  letter-spacing: 1px;
+  margin-bottom: 28px;
+  animation: fadeUp 0.6s ease both;
 }
 
-/* FAQ */
-.faq{
-max-width:700px;
-margin:auto;
-text-align:left;
+.hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(42px, 6vw, 72px);
+  font-weight: 800;
+  line-height: 1.0;
+  letter-spacing: -2px;
+  margin-bottom: 24px;
+  animation: fadeUp 0.6s 0.1s ease both;
 }
 
-.faq-item{
-margin-bottom:15px;
-cursor:pointer;
+.hero-title .line-accent {
+  color: var(--green);
+  position: relative;
+  display: inline-block;
 }
 
-.faq-item h4{
-color:#22c55e;
+.hero-title .line-accent::after {
+  content: '';
+  position: absolute;
+  bottom: -4px; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--green), transparent);
+  border-radius: 2px;
 }
 
-.faq-item p{
-display:none;
-color:#aaa;
+.hero-sub {
+  font-size: 17px;
+  color: var(--muted2);
+  line-height: 1.7;
+  max-width: 440px;
+  margin-bottom: 40px;
+  animation: fadeUp 0.6s 0.2s ease both;
 }
 
-/* CHAT */
-.chat{
-position:fixed;
-bottom:20px;
-right:20px;
-width:320px;
-height:420px;
-background:#020617;
-border:1px solid #22c55e33;
-border-radius:16px;
-display:flex;
-flex-direction:column;
-overflow:hidden;
+.hero-actions {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  animation: fadeUp 0.6s 0.3s ease both;
 }
 
-.messages{
-flex:1;
-padding:10px;
-overflow-y:auto;
-font-size:13px;
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--green);
+  color: #000;
+  font-weight: 700;
+  font-size: 15px;
+  padding: 16px 32px;
+  border-radius: var(--radius);
+  text-decoration: none;
+  transition: all 0.25s;
+  border: none;
+  cursor: pointer;
+}
+.btn-primary:hover { background: #00ffaa; transform: translateY(-2px); box-shadow: 0 12px 32px rgba(0,255,136,0.3); }
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  color: var(--text);
+  font-weight: 600;
+  font-size: 15px;
+  padding: 16px 32px;
+  border-radius: var(--radius);
+  text-decoration: none;
+  border: 1px solid var(--border2);
+  transition: all 0.25s;
+  cursor: pointer;
+}
+.btn-secondary:hover { border-color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.04); }
+
+.hero-stats {
+  display: flex;
+  gap: 32px;
+  margin-top: 48px;
+  animation: fadeUp 0.6s 0.4s ease both;
 }
 
-.input{
-display:flex;
-border-top:1px solid #22c55e33;
+.stat { }
+.stat-num {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--white);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.stat-num span { color: var(--green); }
+.stat-label {
+  font-size: 12px;
+  color: var(--muted);
+  letter-spacing: 0.5px;
 }
 
-.input input{
-flex:1;
-background:none;
-border:none;
-color:#fff;
-padding:10px;
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(20px); }
+  to   { opacity:1; transform:translateY(0); }
 }
 
-.input button{
-background:#22c55e;
-border:none;
-padding:10px;
-cursor:pointer;
+/* ============================================================
+   FLOATING CHAT WIDGET (hero right)
+============================================================ */
+.hero-right {
+  position: relative;
+  height: 580px;
 }
 
-/* FLOAT WHATS */
-.whats{
-position:fixed;
-bottom:20px;
-left:20px;
-background:#22c55e;
-padding:12px;
-border-radius:50%;
-cursor:pointer;
-box-shadow:0 0 20px #22c55e;
+/* Floating card behind */
+.float-card-bg {
+  position: absolute;
+  top: 40px; right: -20px;
+  width: 340px;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 20px;
+  padding: 20px;
+  animation: floatSlow 6s ease-in-out infinite;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.5);
 }
 
+@keyframes floatSlow {
+  0%,100% { transform: translateY(0px) rotate(-1deg); }
+  50%      { transform: translateY(-12px) rotate(-1deg); }
+}
+
+.float-card-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.mini-stat-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.mini-stat {
+  flex: 1;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  text-align: center;
+}
+.mini-stat-n {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--green);
+}
+.mini-stat-l { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+.mini-lead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  background: var(--surface2);
+  border-radius: 8px;
+  margin-top: 8px;
+}
+.mini-lead-av {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--green-dim), var(--green));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.mini-lead-info { flex: 1; }
+.mini-lead-name { font-size: 12px; font-weight: 600; color: var(--white); }
+.mini-lead-sub  { font-size: 10px; color: var(--muted); margin-top: 1px; }
+.mini-lead-badge {
+  font-size: 9px;
+  font-family: var(--font-mono);
+  background: rgba(0,255,136,0.1);
+  border: 1px solid rgba(0,255,136,0.2);
+  color: var(--green);
+  padding: 3px 8px;
+  border-radius: 100px;
+}
+
+/* MAIN CHAT WIDGET */
+.chat-widget {
+  position: absolute;
+  top: 0; left: 0;
+  width: 320px;
+  height: 520px;
+  background: var(--dark);
+  border: 1px solid var(--border2);
+  border-radius: 20px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 40px 100px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.06);
+  animation: floatMain 7s ease-in-out infinite;
+}
+
+@keyframes floatMain {
+  0%,100% { transform: translateY(0px); }
+  50%      { transform: translateY(-16px); }
+}
+
+.cw-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.cw-avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--green-dim), var(--green));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.cw-info { flex: 1; }
+.cw-name { font-size: 13px; font-weight: 700; color: var(--white); }
+.cw-status {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 11px; color: var(--green);
+}
+.cw-dot {
+  width: 6px; height: 6px;
+  background: var(--green);
+  border-radius: 50%;
+  box-shadow: 0 0 5px var(--green);
+  animation: pulse 2s infinite;
+}
+
+.cw-badge {
+  font-size: 9px;
+  font-family: var(--font-mono);
+  color: var(--green);
+  background: rgba(0,255,136,0.1);
+  border: 1px solid rgba(0,255,136,0.2);
+  padding: 3px 8px;
+  border-radius: 100px;
+  letter-spacing: 1px;
+}
+
+.cw-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.cw-messages::-webkit-scrollbar { display: none; }
+
+.cw-msg {
+  max-width: 85%;
+  animation: msgIn 0.3s ease;
+}
+
+@keyframes msgIn {
+  from { opacity:0; transform:translateY(6px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+.cw-msg.ai { align-self: flex-start; }
+.cw-msg.user { align-self: flex-end; }
+
+.cw-bubble {
+  padding: 10px 13px;
+  border-radius: 14px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.cw-msg.ai .cw-bubble {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-bottom-left-radius: 4px;
+  color: var(--text);
+}
+
+.cw-msg.user .cw-bubble {
+  background: linear-gradient(135deg, var(--green-dim), var(--green2));
+  border-bottom-right-radius: 4px;
+  color: var(--white);
+  font-weight: 500;
+}
+
+.cw-wa-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 11px;
+  background: #25D366;
+  border-radius: 12px;
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  margin: 4px 12px;
+  flex-shrink: 0;
+  animation: fadeUp 0.4s ease;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+.cw-wa-btn:hover { background: #20c25e; }
+
+.cw-input-area {
+  padding: 10px 12px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.cw-input-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 8px 8px 8px 14px;
+}
+
+.cw-input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  font-size: 12px;
+  color: var(--text);
+  font-family: var(--font-body);
+}
+.cw-input::placeholder { color: var(--muted); }
+
+.cw-send {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: var(--green);
+  border: none;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+.cw-send:hover { background: #00ffaa; transform: scale(1.05); }
+.cw-send svg { width:14px; height:14px; fill:none; stroke:#000; stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round; }
+
+/* TYPING */
+.typing-dots {
+  display: none;
+  gap: 4px;
+  align-items: center;
+  padding: 10px 13px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  border-bottom-left-radius: 4px;
+  width: fit-content;
+}
+.typing-dots.show { display: flex; }
+.typing-dot {
+  width: 5px; height: 5px;
+  background: var(--green);
+  border-radius: 50%;
+  animation: typingAnim 1.2s infinite;
+}
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes typingAnim {
+  0%,60%,100% { transform:translateY(0); opacity:0.4; }
+  30%          { transform:translateY(-4px); opacity:1; }
+}
+
+/* ============================================================
+   SECTIONS COMMON
+============================================================ */
+section {
+  position: relative;
+  z-index: 2;
+  padding: 100px 32px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.section-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--green);
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.section-label::before {
+  content: '';
+  width: 24px; height: 1px;
+  background: var(--green);
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-size: clamp(32px, 4vw, 52px);
+  font-weight: 800;
+  letter-spacing: -1.5px;
+  line-height: 1.05;
+  margin-bottom: 20px;
+}
+
+.section-sub {
+  font-size: 17px;
+  color: var(--muted2);
+  line-height: 1.7;
+  max-width: 520px;
+  margin-bottom: 64px;
+}
+
+/* ============================================================
+   HOW IT WORKS
+============================================================ */
+.how-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.how-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s;
+}
+.how-card:hover {
+  border-color: rgba(0,255,136,0.25);
+  transform: translateY(-4px);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+}
+.how-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--green), transparent);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.how-card:hover::before { opacity: 1; }
+
+.how-num {
+  font-family: var(--font-display);
+  font-size: 48px;
+  font-weight: 800;
+  color: rgba(0,255,136,0.1);
+  line-height: 1;
+  margin-bottom: 16px;
+}
+
+.how-icon { font-size: 28px; margin-bottom: 14px; }
+
+.how-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 8px;
+}
+
+.how-desc {
+  font-size: 13px;
+  color: var(--muted2);
+  line-height: 1.6;
+}
+
+/* ============================================================
+   FEATURES
+============================================================ */
+.features-wrap { background: rgba(255,255,255,0.01); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1px;
+  background: var(--border);
+}
+
+.feat-card {
+  background: var(--black);
+  padding: 40px 32px;
+  transition: background 0.3s;
+}
+.feat-card:hover { background: var(--surface); }
+
+.feat-icon {
+  font-size: 32px;
+  margin-bottom: 20px;
+}
+
+.feat-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 10px;
+}
+
+.feat-desc {
+  font-size: 14px;
+  color: var(--muted2);
+  line-height: 1.65;
+}
+
+/* ============================================================
+   PROOF / NUMBERS
+============================================================ */
+.numbers-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+@media(max-width: 768px) {
+  .numbers-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+.number-card {
+  background: var(--surface);
+  padding: 40px 32px;
+  text-align: center;
+}
+
+.number-val {
+  font-family: var(--font-display);
+  font-size: 48px;
+  font-weight: 800;
+  color: var(--white);
+  line-height: 1;
+  margin-bottom: 8px;
+}
+.number-val span { color: var(--green); }
+
+.number-label {
+  font-size: 13px;
+  color: var(--muted2);
+}
+
+/* ============================================================
+   CTA SECTION
+============================================================ */
+.cta-section {
+  text-align: center;
+  padding: 120px 32px;
+  position: relative;
+  z-index: 2;
+}
+
+.cta-section::before {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 600px; height: 400px;
+  background: radial-gradient(ellipse, rgba(0,255,136,0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.cta-inner {
+  max-width: 640px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.cta-title {
+  font-family: var(--font-display);
+  font-size: clamp(36px, 5vw, 60px);
+  font-weight: 800;
+  letter-spacing: -2px;
+  line-height: 1.05;
+  margin-bottom: 20px;
+}
+
+.cta-sub {
+  font-size: 17px;
+  color: var(--muted2);
+  margin-bottom: 40px;
+  line-height: 1.6;
+}
+
+.cta-actions {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* ============================================================
+   FOOTER
+============================================================ */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 40px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  z-index: 2;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.footer-logo {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--muted);
+}
+
+.footer-copy {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* ============================================================
+   LIVE DEMO SECTION
+============================================================ */
+.demo-section {
+  padding: 100px 32px;
+  position: relative;
+  z-index: 2;
+}
+
+.demo-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+
+@media(max-width:900px) {
+  .demo-inner { grid-template-columns:1fr; }
+}
+
+.demo-chat-wrap {
+  display: flex;
+  justify-content: center;
+}
+
+.demo-chat {
+  width: 100%;
+  max-width: 360px;
+  height: 500px;
+  background: var(--dark);
+  border: 1px solid var(--border2);
+  border-radius: 20px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 40px 100px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05);
+}
+
+.demo-chat .cw-header { padding: 16px 18px; }
+.demo-chat .cw-messages { padding: 18px 14px; }
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+@media(max-width:600px) {
+  nav { padding: 16px 20px; }
+  .hero { padding: 100px 20px 60px; }
+  section { padding: 64px 20px; }
+  .how-grid { grid-template-columns: 1fr; }
+  .numbers-grid { grid-template-columns: 1fr 1fr; }
+  .cta-section { padding: 80px 20px; }
+  footer { padding: 32px 20px; flex-direction:column; text-align:center; }
+}
+
+/* ============================================================
+   SCROLL REVEAL
+============================================================ */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* stagger delays */
+.reveal-1 { transition-delay: 0.1s; }
+.reveal-2 { transition-delay: 0.2s; }
+.reveal-3 { transition-delay: 0.3s; }
+.reveal-4 { transition-delay: 0.4s; }
 </style>
 </head>
-
 <body>
 
-<section class="hero">
-<h1>Automatize o atendimento da sua clínica com IA</h1>
-<p>Transforme visitantes em pacientes automaticamente. Atendimento inteligente 24h.</p>
-<button class="btn" onclick="whats()">Ver funcionando</button>
+<div class="grid-bg"></div>
+
+<!-- ============================================================
+     NAV
+============================================================ -->
+<nav>
+  <div class="nav-logo">
+    <div class="nav-logo-dot"></div>
+    TekVex AI
+  </div>
+  <ul class="nav-links">
+    <li><a href="#como-funciona">Como funciona</a></li>
+    <li><a href="#demo">Demo ao vivo</a></li>
+    <li><a href="#recursos">Recursos</a></li>
+  </ul>
+  <a href="https://wa.me/5511999999999?text=Olá,%20quero%20saber%20sobre%20o%20TekVex%20AI" class="nav-cta" target="_blank">Falar no WhatsApp</a>
+</nav>
+
+<!-- ============================================================
+     HERO
+============================================================ -->
+<div class="hero">
+  <div class="hero-inner">
+
+    <!-- LEFT -->
+    <div class="hero-left">
+      <div class="hero-badge">
+        <div class="nav-logo-dot"></div>
+        IA em produção para clínicas
+      </div>
+
+      <h1 class="hero-title">
+        Sua clínica<br>
+        atendendo<br>
+        <span class="line-accent">24 horas.</span>
+      </h1>
+
+      <p class="hero-sub">
+        O TekVex AI é uma recepcionista inteligente que atende pacientes, coleta dados e agenda consultas — automaticamente, no WhatsApp e na web.
+      </p>
+
+      <div class="hero-actions">
+        <a href="#demo" class="btn-primary">
+          ▶ Ver demo ao vivo
+        </a>
+        <a href="https://wa.me/5511999999999?text=Quero%20uma%20demonstração%20do%20TekVex%20AI" class="btn-secondary" target="_blank">
+          💬 Falar no WhatsApp
+        </a>
+      </div>
+
+      <div class="hero-stats">
+        <div class="stat">
+          <div class="stat-num">24<span>h</span></div>
+          <div class="stat-label">Atendimento</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">0<span>s</span></div>
+          <div class="stat-label">Tempo de espera</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">100<span>%</span></div>
+          <div class="stat-label">Leads salvos</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT — FLOATING WIDGETS -->
+    <div class="hero-right">
+
+      <!-- CHAT WIDGET PRINCIPAL -->
+      <div class="chat-widget" id="heroChat">
+        <div class="cw-header">
+          <div class="cw-avatar">🏥</div>
+          <div class="cw-info">
+            <div class="cw-name">Vex — Assistente Virtual</div>
+            <div class="cw-status">
+              <div class="cw-dot"></div>
+              Online agora
+            </div>
+          </div>
+          <div class="cw-badge">TekVex AI</div>
+        </div>
+
+        <div class="cw-messages" id="heroChatMessages">
+          <div class="typing-dots" id="heroTyping">
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+          </div>
+        </div>
+
+        <div id="heroWaBtn" style="display:none;">
+          <a class="cw-wa-btn" href="#" target="_blank">
+            💬 Continuar pelo WhatsApp
+          </a>
+        </div>
+
+        <div class="cw-input-area">
+          <div class="cw-input-row">
+            <input class="cw-input" placeholder="Digite sua mensagem..." readonly>
+            <button class="cw-send">
+              <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- FLOATING DASHBOARD CARD -->
+      <div class="float-card-bg">
+        <div class="float-card-label">Dashboard da clínica</div>
+        <div class="mini-stat-row">
+          <div class="mini-stat">
+            <div class="mini-stat-n">12</div>
+            <div class="mini-stat-l">Leads hoje</div>
+          </div>
+          <div class="mini-stat">
+            <div class="mini-stat-n">8</div>
+            <div class="mini-stat-l">Agendados</div>
+          </div>
+          <div class="mini-stat">
+            <div class="mini-stat-n">94<span style="font-size:14px">%</span></div>
+            <div class="mini-stat-l">Conversão</div>
+          </div>
+        </div>
+        <div class="mini-lead">
+          <div class="mini-lead-av">👤</div>
+          <div class="mini-lead-info">
+            <div class="mini-lead-name">Maria Santos</div>
+            <div class="mini-lead-sub">Odontologia · 14h</div>
+          </div>
+          <div class="mini-lead-badge">NOVO</div>
+        </div>
+        <div class="mini-lead" style="margin-top:6px; opacity:0.6;">
+          <div class="mini-lead-av">👤</div>
+          <div class="mini-lead-info">
+            <div class="mini-lead-name">João Oliveira</div>
+            <div class="mini-lead-sub">Cardiologia · 16h</div>
+          </div>
+          <div class="mini-lead-badge" style="color:var(--muted2);border-color:var(--border);">SALVO</div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<!-- ============================================================
+     HOW IT WORKS
+============================================================ -->
+<section id="como-funciona">
+  <div class="section-label">Como funciona</div>
+  <h2 class="section-title reveal">Do primeiro contato<br>ao agendamento</h2>
+  <p class="section-sub reveal reveal-1">Sem recepcionista humana, sem sistema complexo, sem integração manual. A Vex faz tudo.</p>
+
+  <div class="how-grid">
+    <div class="how-card reveal reveal-1">
+      <div class="how-num">01</div>
+      <div class="how-icon">💬</div>
+      <div class="how-title">Paciente abre o chat</div>
+      <div class="how-desc">A Vex inicia a conversa automaticamente com uma saudação personalizada da clínica.</div>
+    </div>
+    <div class="how-card reveal reveal-2">
+      <div class="how-num">02</div>
+      <div class="how-icon">🧠</div>
+      <div class="how-title">IA entende a necessidade</div>
+      <div class="how-desc">Identifica o tipo de consulta, a urgência e conduz o paciente pelo fluxo ideal.</div>
+    </div>
+    <div class="how-card reveal reveal-3">
+      <div class="how-num">03</div>
+      <div class="how-icon">📋</div>
+      <div class="how-title">Coleta os dados</div>
+      <div class="how-desc">Nome, telefone, especialidade e horário preferido — tudo coletado de forma natural.</div>
+    </div>
+    <div class="how-card reveal reveal-4">
+      <div class="how-num">04</div>
+      <div class="how-icon">📲</div>
+      <div class="how-title">Encaminha pro WhatsApp</div>
+      <div class="how-desc">Lead salvo no banco de dados e paciente direcionado pro WhatsApp da clínica para confirmar.</div>
+    </div>
+  </div>
 </section>
 
-<section class="section">
-<h2>Resultados</h2>
-<div class="cards">
-<div class="card">+300% mais agendamentos</div>
-<div class="card">Resposta instantânea</div>
-<div class="card">Zero perda de leads</div>
+<!-- ============================================================
+     DEMO AO VIVO
+============================================================ -->
+<div id="demo" class="demo-section">
+  <div class="demo-inner">
+
+    <div>
+      <div class="section-label">Demo interativo</div>
+      <h2 class="section-title reveal">Teste agora.<br>Ao vivo.</h2>
+      <p class="section-sub reveal reveal-1" style="margin-bottom:32px;">
+        Este é o produto real funcionando. Converse com a Vex, veja como ela conduz o paciente até o agendamento.
+      </p>
+
+      <ul style="list-style:none;display:flex;flex-direction:column;gap:12px;" class="reveal reveal-2">
+        <li style="display:flex;align-items:center;gap:12px;font-size:14px;color:var(--muted2);">
+          <span style="color:var(--green);font-size:18px;">✓</span> Conversa natural em português
+        </li>
+        <li style="display:flex;align-items:center;gap:12px;font-size:14px;color:var(--muted2);">
+          <span style="color:var(--green);font-size:18px;">✓</span> Coleta nome, telefone, especialidade e horário
+        </li>
+        <li style="display:flex;align-items:center;gap:12px;font-size:14px;color:var(--muted2);">
+          <span style="color:var(--green);font-size:18px;">✓</span> Gera botão de WhatsApp automaticamente
+        </li>
+        <li style="display:flex;align-items:center;gap:12px;font-size:14px;color:var(--muted2);">
+          <span style="color:var(--green);font-size:18px;">✓</span> Salva o lead no banco de dados
+        </li>
+      </ul>
+
+      <div style="margin-top:40px;" class="reveal reveal-3">
+        <a href="https://tekvex-ai.vercel.app" target="_blank" class="btn-primary">
+          Abrir demo completo ↗
+        </a>
+      </div>
+    </div>
+
+    <!-- CHAT INTERATIVO -->
+    <div class="demo-chat-wrap reveal reveal-2">
+      <div class="demo-chat" id="demoChat">
+        <div class="cw-header">
+          <div class="cw-avatar">🏥</div>
+          <div class="cw-info">
+            <div class="cw-name">Vex — Assistente Virtual</div>
+            <div class="cw-status">
+              <div class="cw-dot"></div>
+              Online agora
+            </div>
+          </div>
+          <div class="cw-badge">TekVex AI</div>
+        </div>
+
+        <div class="cw-messages" id="demoChatMessages">
+          <div class="typing-dots show" id="demoTyping">
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+          </div>
+        </div>
+
+        <div id="demoWaBtn" style="display:none; padding: 0 12px 8px;">
+          <a class="cw-wa-btn" href="https://wa.me/5511999999999" target="_blank">
+            💬 Continuar pelo WhatsApp
+          </a>
+        </div>
+
+        <div class="cw-input-area">
+          <div class="cw-input-row">
+            <input class="cw-input" id="demoInput" placeholder="Digite sua mensagem...">
+            <button class="cw-send" id="demoSend">
+              <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
 </div>
+
+<!-- ============================================================
+     FEATURES
+============================================================ -->
+<div class="features-wrap" id="recursos">
+  <section style="padding: 80px 32px;">
+    <div class="section-label">Recursos</div>
+    <h2 class="section-title reveal">Tudo que sua clínica<br>precisa, pronto.</h2>
+  </section>
+
+  <div class="features-grid">
+    <div class="feat-card reveal">
+      <div class="feat-icon">🤖</div>
+      <div class="feat-title">IA Conversacional</div>
+      <div class="feat-desc">Powered by Claude, a IA mais avançada do mercado. Conversa natural, empática e profissional em português.</div>
+    </div>
+    <div class="feat-card reveal reveal-1">
+      <div class="feat-icon">📊</div>
+      <div class="feat-title">Dashboard de Leads</div>
+      <div class="feat-desc">Painel exclusivo para a clínica ver todos os leads em tempo real — nome, contato, especialidade e horário.</div>
+    </div>
+    <div class="feat-card reveal reveal-2">
+      <div class="feat-icon">💾</div>
+      <div class="feat-title">Banco de Dados</div>
+      <div class="feat-desc">Todos os leads salvos permanentemente. Nenhum paciente perdido, mesmo fora do horário de atendimento.</div>
+    </div>
+    <div class="feat-card reveal reveal-3">
+      <div class="feat-icon">📲</div>
+      <div class="feat-title">Integração WhatsApp</div>
+      <div class="feat-desc">Ao final da conversa, o paciente é direcionado pro WhatsApp da clínica com a mensagem já preenchida.</div>
+    </div>
+    <div class="feat-card reveal">
+      <div class="feat-icon">🔒</div>
+      <div class="feat-title">Seguro e Privado</div>
+      <div class="feat-desc">Dados criptografados, HTTPS obrigatório e chaves de acesso protegidas. Conformidade com LGPD.</div>
+    </div>
+    <div class="feat-card reveal reveal-1">
+      <div class="feat-icon">⚡</div>
+      <div class="feat-title">Setup em 24h</div>
+      <div class="feat-desc">Personalizado com o nome, especialidade e estilo da clínica. Em produção em menos de um dia.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     NUMBERS
+============================================================ -->
+<section style="padding: 80px 32px;">
+  <div class="numbers-grid">
+    <div class="number-card reveal">
+      <div class="number-val">24<span>h</span></div>
+      <div class="number-label">Atendimento ininterrupto</div>
+    </div>
+    <div class="number-card reveal reveal-1">
+      <div class="number-val"><span>0</span></div>
+      <div class="number-label">Custo por atendimento</div>
+    </div>
+    <div class="number-card reveal reveal-2">
+      <div class="number-val">100<span>%</span></div>
+      <div class="number-label">Leads registrados</div>
+    </div>
+    <div class="number-card reveal reveal-3">
+      <div class="number-val"><span>&lt;</span>1s</div>
+      <div class="number-label">Tempo de resposta</div>
+    </div>
+  </div>
 </section>
 
-<section class="section">
-<h2>Como funciona</h2>
-<div class="flow">
-<div>Paciente entra no site</div>
-<div>IA responde automaticamente</div>
-<div>Coleta dados</div>
-<div>Envia para WhatsApp</div>
-</div>
-</section>
-
-<section class="section">
-<h2>Simulação real</h2>
-<div class="card">"Quero agendar" → resposta automática → coleta → envio</div>
-</section>
-
-<section class="section">
-<h2>Oferta</h2>
-<p>Implementação completa da IA na sua clínica</p>
-<button class="btn" onclick="whats()">Falar agora</button>
-</section>
-
-<section class="section">
-<h2>Dúvidas</h2>
-<div class="faq">
-<div class="faq-item" onclick="toggle(this)">
-<h4>Funciona para qualquer clínica?</h4>
-<p>Sim, totalmente adaptável.</p>
-</div>
-<div class="faq-item" onclick="toggle(this)">
-<h4>Preciso saber tecnologia?</h4>
-<p>Não, entregamos tudo pronto.</p>
-</div>
-</div>
-</section>
-
-<!-- CHAT -->
-<div class="chat">
-<div class="messages" id="msg"></div>
-
-<div class="input">
-<input id="input" placeholder="Digite..." />
-<button onclick="send()">→</button>
-</div>
+<!-- ============================================================
+     CTA FINAL
+============================================================ -->
+<div class="cta-section">
+  <div class="cta-inner">
+    <h2 class="cta-title reveal">Pronto para<br>automatizar sua<br><span style="color:var(--green)">clínica?</span></h2>
+    <p class="cta-sub reveal reveal-1">Implementação em 24 horas. Setup completo + mensalidade acessível. Fale agora no WhatsApp.</p>
+    <div class="cta-actions reveal reveal-2">
+      <a href="https://wa.me/5511999999999?text=Olá,%20quero%20implementar%20o%20TekVex%20AI%20na%20minha%20clínica" class="btn-primary" target="_blank">
+        💬 Quero implementar agora
+      </a>
+      <a href="https://tekvex-ai.vercel.app" class="btn-secondary" target="_blank">
+        Ver demo completo ↗
+      </a>
+    </div>
+  </div>
 </div>
 
-<div class="whats" onclick="whats()">💬</div>
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">TekVex AI</div>
+  <div class="footer-copy">© 2025 TekVex Engine. Todos os direitos reservados.</div>
+</footer>
 
+<!-- ============================================================
+     SCRIPTS
+============================================================ -->
 <script>
+// ============================================================
+// CONFIG
+// ============================================================
+const API_URL = 'https://tekvex-ai-production.up.railway.app';
+const WA_NUM  = '5511999999999';
 
-const API="https://tekvex-ai-production.up.railway.app/chat";
+// ============================================================
+// SCROLL REVEAL
+// ============================================================
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      revealObserver.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.1 });
 
-function session(){
-let s=localStorage.getItem("vex");
-if(!s){
-s="sess_"+Math.random();
-localStorage.setItem("vex",s);
+document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+// ============================================================
+// HERO CHAT — simulado (demo estático bonito)
+// ============================================================
+const heroMsgs = document.getElementById('heroChatMessages');
+const heroTyping = document.getElementById('heroTyping');
+
+const heroScript = [
+  { role:'ai',   text:'Olá! 👋 Sou a Vex, assistente da Clínica São Lucas. Como posso te ajudar hoje?' },
+  { role:'user', text:'Quero marcar uma consulta com dentista' },
+  { role:'ai',   text:'Claro! Posso te ajudar com isso. Qual é o seu nome completo?' },
+  { role:'user', text:'Maria Santos' },
+  { role:'ai',   text:'Prazer, Maria! 😊 Qual seu telefone para contato?' },
+  { role:'user', text:'(44) 98765-4321' },
+  { role:'ai',   text:'✅ Dados confirmados! Encaminhando para nossa equipe agora.' },
+];
+
+let heroIdx = 0;
+
+function addHeroMsg(msg) {
+  const div = document.createElement('div');
+  div.className = `cw-msg ${msg.role}`;
+  div.innerHTML = `<div class="cw-bubble">${msg.text}</div>`;
+  heroMsgs.insertBefore(div, heroTyping);
+  heroMsgs.scrollTop = heroMsgs.scrollHeight;
 }
-return s;
+
+function runHeroScript() {
+  if (heroIdx >= heroScript.length) {
+    document.getElementById('heroWaBtn').style.display = 'block';
+    heroTyping.classList.remove('show');
+    setTimeout(() => { heroIdx = 0; heroMsgs.innerHTML = ''; heroMsgs.appendChild(heroTyping); document.getElementById('heroWaBtn').style.display='none'; runHeroScript(); }, 4000);
+    return;
+  }
+
+  const msg = heroScript[heroIdx];
+  heroTyping.classList.add('show');
+  heroMsgs.scrollTop = heroMsgs.scrollHeight;
+
+  setTimeout(() => {
+    heroTyping.classList.remove('show');
+    addHeroMsg(msg);
+    heroIdx++;
+    const delay = msg.role === 'user' ? 1200 : 2200;
+    setTimeout(runHeroScript, delay);
+  }, msg.role === 'ai' ? 1400 : 600);
 }
 
-async function send(){
-let i=document.getElementById("input");
-let t=i.value;
-if(!t)return;
+setTimeout(runHeroScript, 1000);
 
-add("Você",t);
-i.value="";
+// ============================================================
+// DEMO CHAT — conectado ao backend real
+// ============================================================
+const demoMessages = document.getElementById('demoChatMessages');
+const demoTyping   = document.getElementById('demoTyping');
+const demoInput    = document.getElementById('demoInput');
+const demoSend     = document.getElementById('demoSend');
 
-let r=await fetch(API,{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({message:t,sessionId:session()})
+const demoSessionId = 'demo_' + Math.random().toString(36).substr(2, 10);
+let demoWaiting = false;
+
+function addDemoMsg(role, text) {
+  const clean = text.replace(/\[LEAD:.*?\]/gs, '').trim();
+  if (!clean) return;
+  const div = document.createElement('div');
+  div.className = `cw-msg ${role}`;
+  div.innerHTML = `<div class="cw-bubble">${clean.replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</div>`;
+  demoMessages.insertBefore(div, demoTyping);
+  demoMessages.scrollTop = demoMessages.scrollHeight;
+}
+
+async function demoCallBackend(message) {
+  const res = await fetch(`${API_URL}/chat`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message, sessionId: demoSessionId }),
+  });
+  if (!res.ok) throw new Error('Erro na API');
+  return res.json();
+}
+
+async function demoGreeting() {
+  demoTyping.classList.add('show');
+  try {
+    const data = await demoCallBackend('Olá');
+    demoTyping.classList.remove('show');
+    addDemoMsg('ai', data.reply);
+    if (data.leadDetected) {
+      document.getElementById('demoWaBtn').style.display = 'block';
+    }
+  } catch(e) {
+    demoTyping.classList.remove('show');
+    addDemoMsg('ai', 'Olá! Sou a Vex. Como posso ajudar sua clínica hoje?');
+  }
+}
+
+async function demoSendMsg() {
+  const text = demoInput.value.trim();
+  if (!text || demoWaiting) return;
+
+  addDemoMsg('user', text);
+  demoInput.value = '';
+  demoWaiting = true;
+  demoSend.disabled = true;
+  demoTyping.classList.add('show');
+  demoMessages.scrollTop = demoMessages.scrollHeight;
+
+  try {
+    const data = await demoCallBackend(text);
+    demoTyping.classList.remove('show');
+    addDemoMsg('ai', data.reply);
+    if (data.leadDetected) {
+      document.getElementById('demoWaBtn').style.display = 'block';
+    }
+  } catch(e) {
+    demoTyping.classList.remove('show');
+    addDemoMsg('ai', 'Desculpe, tive um problema. Tente novamente.');
+  } finally {
+    demoWaiting = false;
+    demoSend.disabled = false;
+  }
+}
+
+demoSend.addEventListener('click', demoSendMsg);
+demoInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); demoSendMsg(); }
 });
 
-let d=await r.json();
-add("Vex",d.reply);
-}
-
-function add(s,t){
-let d=document.createElement("div");
-d.innerHTML="<b>"+s+":</b> "+t;
-document.getElementById("msg").appendChild(d);
-}
-
-function whats(){
-window.open("https://wa.me/5544988319304?text=Quero%20automatizar%20meu%20atendimento");
-}
-
-function toggle(e){
-let p=e.querySelector("p");
-p.style.display=p.style.display=="block"?"none":"block";
-}
-
+// Inicia greeting após 800ms
+setTimeout(demoGreeting, 800);
 </script>
 
 </body>
