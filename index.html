@@ -1,261 +1,318 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>TekVex AI</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TekVex AI</title>
 
-  <!-- FONT -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
 
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Inter', sans-serif;
-    }
+<style>
 
-    body {
-      background: radial-gradient(circle at top, #020617, #000);
-      color: #e5e7eb;
-      overflow-x: hidden;
-    }
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Inter',sans-serif;
+}
 
-    /* HERO */
-    .hero {
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      padding: 20px;
-    }
+body{
+background:#000;
+color:#fff;
+overflow-x:hidden;
+}
 
-    .hero h1 {
-      font-size: 42px;
-      max-width: 800px;
-      background: linear-gradient(90deg, #22c55e, #4ade80);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
+/* BACKGROUND GLOW */
+body::before{
+content:"";
+position:fixed;
+width:600px;
+height:600px;
+background:radial-gradient(circle,#22c55e55,transparent);
+top:-100px;
+left:-100px;
+filter:blur(120px);
+z-index:-1;
+}
 
-    .hero p {
-      margin-top: 15px;
-      font-size: 18px;
-      color: #9ca3af;
-      max-width: 600px;
-    }
+/* HERO */
+.hero{
+height:100vh;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+text-align:center;
+padding:20px;
+}
 
-    .cta {
-      margin-top: 25px;
-      display: flex;
-      gap: 15px;
-    }
+.hero h1{
+font-size:48px;
+max-width:800px;
+background:linear-gradient(90deg,#22c55e,#4ade80);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+}
 
-    .btn {
-      padding: 12px 20px;
-      border-radius: 10px;
-      border: none;
-      cursor: pointer;
-      font-size: 14px;
-      transition: 0.2s;
-    }
+.hero p{
+margin-top:20px;
+color:#aaa;
+max-width:600px;
+}
 
-    .btn-primary {
-      background: #22c55e;
-      color: #020617;
-    }
+.btn{
+margin-top:30px;
+padding:14px 24px;
+background:#22c55e;
+border:none;
+border-radius:12px;
+cursor:pointer;
+font-weight:600;
+transition:.2s;
+}
 
-    .btn-secondary {
-      background: transparent;
-      border: 1px solid #22c55e;
-      color: #22c55e;
-    }
+.btn:hover{
+transform:scale(1.1);
+box-shadow:0 0 20px #22c55e;
+}
 
-    .btn:hover {
-      transform: scale(1.05);
-    }
+/* SECTION */
+.section{
+padding:100px 20px;
+text-align:center;
+}
 
-    /* CHAT FLOAT */
-    .chat-box {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      width: 320px;
-      height: 420px;
-      background: rgba(2, 6, 23, 0.9);
-      backdrop-filter: blur(20px);
-      border: 1px solid #22c55e33;
-      border-radius: 16px;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      box-shadow: 0 0 40px #22c55e22;
-    }
+.section h2{
+font-size:32px;
+margin-bottom:40px;
+}
 
-    .chat-header {
-      padding: 12px;
-      border-bottom: 1px solid #22c55e22;
-      font-size: 14px;
-      color: #22c55e;
-    }
+/* CARDS */
+.cards{
+display:flex;
+flex-wrap:wrap;
+gap:20px;
+justify-content:center;
+}
 
-    .chat-messages {
-      flex: 1;
-      padding: 10px;
-      overflow-y: auto;
-      font-size: 13px;
-    }
+.card{
+width:260px;
+padding:20px;
+background:rgba(255,255,255,0.03);
+border:1px solid #22c55e33;
+border-radius:16px;
+backdrop-filter:blur(10px);
+transition:.3s;
+}
 
-    .chat-input {
-      display: flex;
-      border-top: 1px solid #22c55e22;
-    }
+.card:hover{
+transform:translateY(-10px);
+box-shadow:0 0 30px #22c55e44;
+}
 
-    .chat-input input {
-      flex: 1;
-      padding: 10px;
-      background: transparent;
-      border: none;
-      color: white;
-      outline: none;
-    }
+/* FLOW */
+.flow{
+display:flex;
+flex-direction:column;
+gap:30px;
+max-width:600px;
+margin:auto;
+}
 
-    .chat-input button {
-      background: #22c55e;
-      border: none;
-      padding: 10px;
-      cursor: pointer;
-    }
+.flow div{
+padding:15px;
+border-left:3px solid #22c55e;
+text-align:left;
+}
 
-    /* QUICK BUTTONS */
-    .quick {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      padding: 8px;
-    }
+/* FAQ */
+.faq{
+max-width:700px;
+margin:auto;
+text-align:left;
+}
 
-    .quick button {
-      font-size: 11px;
-      padding: 6px 8px;
-      background: transparent;
-      border: 1px solid #22c55e33;
-      color: #22c55e;
-      border-radius: 8px;
-      cursor: pointer;
-    }
+.faq-item{
+margin-bottom:15px;
+cursor:pointer;
+}
 
-    /* BENEFITS */
-    .section {
-      padding: 80px 20px;
-      text-align: center;
-    }
+.faq-item h4{
+color:#22c55e;
+}
 
-    .cards {
-      display: flex;
-      gap: 20px;
-      flex-wrap: wrap;
-      justify-content: center;
-      margin-top: 30px;
-    }
+.faq-item p{
+display:none;
+color:#aaa;
+}
 
-    .card {
-      width: 250px;
-      padding: 20px;
-      background: rgba(2, 6, 23, 0.6);
-      border: 1px solid #22c55e22;
-      border-radius: 12px;
-      backdrop-filter: blur(10px);
-    }
-  </style>
+/* CHAT */
+.chat{
+position:fixed;
+bottom:20px;
+right:20px;
+width:320px;
+height:420px;
+background:#020617;
+border:1px solid #22c55e33;
+border-radius:16px;
+display:flex;
+flex-direction:column;
+overflow:hidden;
+}
+
+.messages{
+flex:1;
+padding:10px;
+overflow-y:auto;
+font-size:13px;
+}
+
+.input{
+display:flex;
+border-top:1px solid #22c55e33;
+}
+
+.input input{
+flex:1;
+background:none;
+border:none;
+color:#fff;
+padding:10px;
+}
+
+.input button{
+background:#22c55e;
+border:none;
+padding:10px;
+cursor:pointer;
+}
+
+/* FLOAT WHATS */
+.whats{
+position:fixed;
+bottom:20px;
+left:20px;
+background:#22c55e;
+padding:12px;
+border-radius:50%;
+cursor:pointer;
+box-shadow:0 0 20px #22c55e;
+}
+
+</style>
 </head>
 
 <body>
 
-  <section class="hero">
-    <h1>Automatize o atendimento da sua clínica com IA</h1>
-    <p>Responda pacientes automaticamente, aumente agendamentos e nunca perca um lead.</p>
+<section class="hero">
+<h1>Automatize o atendimento da sua clínica com IA</h1>
+<p>Transforme visitantes em pacientes automaticamente. Atendimento inteligente 24h.</p>
+<button class="btn" onclick="whats()">Ver funcionando</button>
+</section>
 
-    <div class="cta">
-      <button class="btn btn-primary" onclick="openWhats()">Ver funcionando</button>
-      <button class="btn btn-secondary" onclick="openWhats()">Falar no WhatsApp</button>
-    </div>
-  </section>
+<section class="section">
+<h2>Resultados</h2>
+<div class="cards">
+<div class="card">+300% mais agendamentos</div>
+<div class="card">Resposta instantânea</div>
+<div class="card">Zero perda de leads</div>
+</div>
+</section>
 
-  <section class="section">
-    <h2>Resultados reais</h2>
-    <div class="cards">
-      <div class="card">+ Agendamentos automáticos</div>
-      <div class="card">Atendimento 24h</div>
-      <div class="card">Zero perda de leads</div>
-    </div>
-  </section>
+<section class="section">
+<h2>Como funciona</h2>
+<div class="flow">
+<div>Paciente entra no site</div>
+<div>IA responde automaticamente</div>
+<div>Coleta dados</div>
+<div>Envia para WhatsApp</div>
+</div>
+</section>
 
-  <!-- CHAT -->
-  <div class="chat-box">
-    <div class="chat-header">Vex • Assistente IA</div>
+<section class="section">
+<h2>Simulação real</h2>
+<div class="card">"Quero agendar" → resposta automática → coleta → envio</div>
+</section>
 
-    <div id="messages" class="chat-messages"></div>
+<section class="section">
+<h2>Oferta</h2>
+<p>Implementação completa da IA na sua clínica</p>
+<button class="btn" onclick="whats()">Falar agora</button>
+</section>
 
-    <div class="quick">
-      <button onclick="sendQuick('Quero automatizar minha clínica')">Automatizar</button>
-      <button onclick="sendQuick('Como funciona?')">Como funciona</button>
-      <button onclick="sendQuick('Quero ver na prática')">Ver na prática</button>
-    </div>
+<section class="section">
+<h2>Dúvidas</h2>
+<div class="faq">
+<div class="faq-item" onclick="toggle(this)">
+<h4>Funciona para qualquer clínica?</h4>
+<p>Sim, totalmente adaptável.</p>
+</div>
+<div class="faq-item" onclick="toggle(this)">
+<h4>Preciso saber tecnologia?</h4>
+<p>Não, entregamos tudo pronto.</p>
+</div>
+</div>
+</section>
 
-    <div class="chat-input">
-      <input id="input" placeholder="Digite..." />
-      <button onclick="sendMessage()">→</button>
-    </div>
-  </div>
+<!-- CHAT -->
+<div class="chat">
+<div class="messages" id="msg"></div>
+
+<div class="input">
+<input id="input" placeholder="Digite..." />
+<button onclick="send()">→</button>
+</div>
+</div>
+
+<div class="whats" onclick="whats()">💬</div>
 
 <script>
-const API = "https://tekvex-ai-production.up.railway.app/chat";
 
-function createSession(){
-  const id = 'sess_' + Math.random().toString(36).substring(2) + Date.now();
-  localStorage.setItem('vex_session', id);
-  return id;
+const API="https://tekvex-ai-production.up.railway.app/chat";
+
+function session(){
+let s=localStorage.getItem("vex");
+if(!s){
+s="sess_"+Math.random();
+localStorage.setItem("vex",s);
+}
+return s;
 }
 
-function sendQuick(text){
-  document.getElementById('input').value = text;
-  sendMessage();
+async function send(){
+let i=document.getElementById("input");
+let t=i.value;
+if(!t)return;
+
+add("Você",t);
+i.value="";
+
+let r=await fetch(API,{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({message:t,sessionId:session()})
+});
+
+let d=await r.json();
+add("Vex",d.reply);
 }
 
-async function sendMessage(){
-  const input = document.getElementById('input');
-  const msg = input.value;
-  if(!msg) return;
-
-  addMessage("Você", msg);
-  input.value = "";
-
-  const res = await fetch(API, {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({
-      message: msg,
-      sessionId: localStorage.getItem('vex_session') || createSession()
-    })
-  });
-
-  const data = await res.json();
-  addMessage("Vex", data.reply);
+function add(s,t){
+let d=document.createElement("div");
+d.innerHTML="<b>"+s+":</b> "+t;
+document.getElementById("msg").appendChild(d);
 }
 
-function addMessage(sender, text){
-  const div = document.createElement("div");
-  div.innerHTML = `<strong>${sender}:</strong> ${text}`;
-  document.getElementById("messages").appendChild(div);
+function whats(){
+window.open("https://wa.me/5544988319304?text=Quero%20automatizar%20meu%20atendimento");
 }
 
-function openWhats(){
-  window.open("https://wa.me/5544988319304?text=Quero%20automatizar%20meu%20atendimento", "_blank");
+function toggle(e){
+let p=e.querySelector("p");
+p.style.display=p.style.display=="block"?"none":"block";
 }
+
 </script>
 
 </body>
