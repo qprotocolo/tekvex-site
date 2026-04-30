@@ -1276,7 +1276,27 @@ footer {
 // CONFIG
 // ============================================================
 const API_URL = 'https://tekvex-ai-production.up.railway.app';
-const WA_NUM  = '5511999999999';
+
+const WA_NUM = '5544988319304';
+
+const WA_MESSAGES = {
+  nav: "Olá, quero saber sobre o TekVex AI",
+  hero: "Quero uma demonstração do TekVex AI",
+  cta: "Quero implementar o TekVex AI na minha clínica",
+  chat: "Quero continuar pelo WhatsApp"
+};
+
+function buildWhatsAppLink(text) {
+  return `https://wa.me/${WA_NUM}?text=${encodeURIComponent(text)}`;
+}
+
+// ============================================================
+// INJEÇÃO WHATSAPP (NAV)
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+  const nav = document.getElementById('waNav');
+  if (nav) nav.href = buildWhatsAppLink(WA_MESSAGES.nav);
+});
 
 // ============================================================
 // SCROLL REVEAL
@@ -1293,7 +1313,7 @@ const revealObserver = new IntersectionObserver((entries) => {
 document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
 
 // ============================================================
-// HERO CHAT — simulado (demo estático bonito)
+// HERO CHAT — simulado
 // ============================================================
 const heroMsgs = document.getElementById('heroChatMessages');
 const heroTyping = document.getElementById('heroTyping');
@@ -1322,7 +1342,13 @@ function runHeroScript() {
   if (heroIdx >= heroScript.length) {
     document.getElementById('heroWaBtn').style.display = 'block';
     heroTyping.classList.remove('show');
-    setTimeout(() => { heroIdx = 0; heroMsgs.innerHTML = ''; heroMsgs.appendChild(heroTyping); document.getElementById('heroWaBtn').style.display='none'; runHeroScript(); }, 4000);
+    setTimeout(() => {
+      heroIdx = 0;
+      heroMsgs.innerHTML = '';
+      heroMsgs.appendChild(heroTyping);
+      document.getElementById('heroWaBtn').style.display='none';
+      runHeroScript();
+    }, 4000);
     return;
   }
 
@@ -1342,7 +1368,7 @@ function runHeroScript() {
 setTimeout(runHeroScript, 1000);
 
 // ============================================================
-// DEMO CHAT — conectado ao backend real
+// DEMO CHAT — backend
 // ============================================================
 const demoMessages = document.getElementById('demoChatMessages');
 const demoTyping   = document.getElementById('demoTyping');
@@ -1416,10 +1442,12 @@ async function demoSendMsg() {
 
 demoSend.addEventListener('click', demoSendMsg);
 demoInput.addEventListener('keydown', e => {
-  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); demoSendMsg(); }
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    demoSendMsg();
+  }
 });
 
-// Inicia greeting após 800ms
 setTimeout(demoGreeting, 800);
 </script>
 
