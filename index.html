@@ -1298,6 +1298,12 @@ function buildWhatsAppLink(text) {
 document.addEventListener('DOMContentLoaded', () => {
   const nav = document.getElementById('waNav');
   if (nav) nav.href = buildWhatsAppLink(WA_MESSAGES.nav);
+
+  const heroBtn = document.getElementById('heroWaBtn');
+  if (heroBtn) heroBtn.href = buildWhatsAppLink(WA_MESSAGES.hero);
+
+  const demoBtn = document.getElementById('demoWaBtn');
+  if (demoBtn) demoBtn.href = buildWhatsAppLink(WA_MESSAGES.chat);
 });
 
 // ============================================================
