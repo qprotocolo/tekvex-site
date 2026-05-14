@@ -763,6 +763,105 @@ section {
 }
 
 /* ============================================================
+   PRICING
+============================================================ */
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 24px;
+}
+
+.pricing-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 36px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s;
+}
+
+.pricing-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(0,255,136,0.25);
+  box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+}
+
+.pricing-card.featured {
+  border-color: rgba(0,255,136,0.35);
+  box-shadow: 0 0 0 1px rgba(0,255,136,0.15);
+}
+
+.pricing-badge {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  background: rgba(0,255,136,0.12);
+  border: 1px solid rgba(0,255,136,0.2);
+  color: var(--green);
+  font-size: 10px;
+  font-family: var(--font-mono);
+  padding: 6px 10px;
+  border-radius: 100px;
+  letter-spacing: 1px;
+}
+
+.pricing-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: var(--white);
+}
+
+.pricing-price {
+  font-family: var(--font-display);
+  font-size: 52px;
+  font-weight: 800;
+  line-height: 1;
+  margin-bottom: 10px;
+}
+
+.pricing-price span {
+  font-size: 18px;
+  color: var(--muted2);
+}
+
+.pricing-desc {
+  color: var(--muted2);
+  font-size: 14px;
+  line-height: 1.7;
+  margin-bottom: 28px;
+}
+
+.pricing-features {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 32px;
+}
+
+.pricing-features li {
+  color: var(--text);
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pricing-features li::before {
+  content: '✓';
+  color: var(--green);
+  font-weight: bold;
+}
+
+.pricing-btn {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+   
+/* ============================================================
    CTA SECTION
 ============================================================ */
 .cta-section {
